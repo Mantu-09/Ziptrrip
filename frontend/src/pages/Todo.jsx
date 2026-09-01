@@ -5,9 +5,9 @@ import '../styles/Todo.css';
 
 const PRIORITY_LABEL = { low: 'Low', medium: 'Medium', high: 'High' };
 
-// ── Helpers ────────────────────────────────────────────────────
 function formatDate(dateStr) {
   if (!dateStr) return null;
+  // Append time so the Date constructor treats this as local, not UTC midnight
   return new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric',
   });
@@ -21,7 +21,6 @@ function formatDateTime(iso) {
   });
 }
 
-// ── Back button sub-component ──────────────────────────────────
 function BackBtn({ onClick }) {
   return (
     <button className="back-btn" onClick={onClick}>
@@ -30,26 +29,21 @@ function BackBtn({ onClick }) {
   );
 }
 
-// ── Main component ─────────────────────────────────────────────
 export default function TodoDetail() {
   const [searchParams] = useSearchParams();
   const navigate       = useNavigate();
   const id             = searchParams.get('id');
 
-  // Data
   const [todo,     setTodo]     = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);  // null | 'no_id' | 'not_found' | 'network'
 
-  // Edit mode
   const [editing,  setEditing]  = useState(false);
   const [form,     setForm]     = useState({});
   const [saving,   setSaving]   = useState(false);
 
-  // Delete
   const [deleting, setDeleting] = useState(false);
 
-  // ── Load ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!id) {
       setLoading(false);
@@ -73,7 +67,6 @@ export default function TodoDetail() {
     }
   }
 
-  // ── Edit handlers ──────────────────────────────────────────────
   function startEdit() {
     setForm({
       title:       todo.title,
@@ -99,7 +92,6 @@ export default function TodoDetail() {
     }
   }
 
-  // ── Delete handler ─────────────────────────────────────────────
   async function handleDelete() {
     if (!window.confirm('Delete this todo? This cannot be undone.')) return;
     setDeleting(true);
@@ -112,7 +104,6 @@ export default function TodoDetail() {
     }
   }
 
-  // ── Render: loading ────────────────────────────────────────────
   if (loading) {
     return (
       <div className="detail-page">
@@ -122,7 +113,6 @@ export default function TodoDetail() {
     );
   }
 
-  // ── Render: error / not found ──────────────────────────────────
   if (error) {
     return (
       <div className="detail-page">
@@ -163,7 +153,6 @@ export default function TodoDetail() {
     );
   }
 
-  // ── Render: edit mode ──────────────────────────────────────────
   if (editing) {
     return (
       <div className="detail-page">
@@ -244,13 +233,11 @@ export default function TodoDetail() {
     );
   }
 
-  // ── Render: view mode ──────────────────────────────────────────
   return (
     <div className="detail-page">
       <BackBtn onClick={() => navigate('/')} />
 
       <div className="detail-card">
-        {/* Header: title + status + actions */}
         <div className="detail-header">
           <div className="detail-title-row">
             <h1 className={`detail-title${todo.completed ? ' done' : ''}`}>
@@ -268,12 +255,10 @@ export default function TodoDetail() {
           </div>
         </div>
 
-        {/* Description */}
         {todo.description && (
           <p className="detail-description">{todo.description}</p>
         )}
 
-        {/* Fields */}
         <dl className="detail-fields">
           <div className="field-row">
             <dt>Priority</dt>
@@ -283,7 +268,6 @@ export default function TodoDetail() {
               </span>
             </dd>
           </div>
-
           <div className="field-row">
             <dt>Due date</dt>
             <dd>
@@ -292,17 +276,14 @@ export default function TodoDetail() {
                 : <span className="muted">—</span>}
             </dd>
           </div>
-
           <div className="field-row">
             <dt>Status</dt>
             <dd>{todo.completed ? 'Completed' : 'Active'}</dd>
           </div>
-
           <div className="field-row">
             <dt>Created</dt>
             <dd>{formatDateTime(todo.createdAt)}</dd>
           </div>
-
           <div className="field-row">
             <dt>ID</dt>
             <dd><span className="id-value">{todo.id}</span></dd>

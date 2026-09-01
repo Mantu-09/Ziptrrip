@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as api from '../api/todos';
 import '../styles/Home.css';
@@ -9,25 +9,20 @@ const EMPTY_FORM     = { title: '', description: '', priority: 'medium', dueDate
 export default function Home() {
   const navigate = useNavigate();
 
-  // ── Data state ────────────────────────────────────────────────
   const [todos,   setTodos]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
 
-  // ── UI state ──────────────────────────────────────────────────
-  const [filter, setFilter] = useState('all');   // 'all' | 'active' | 'completed'
+  const [filter, setFilter] = useState('all');  // 'all' | 'active' | 'completed'
   const [search, setSearch] = useState('');
 
-  // ── Add form ──────────────────────────────────────────────────
   const [form,   setForm]   = useState(EMPTY_FORM);
   const [adding, setAdding] = useState(false);
 
-  // ── Edit state ────────────────────────────────────────────────
   const [editId,   setEditId]   = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving,   setSaving]   = useState(false);
 
-  // ── Load todos ────────────────────────────────────────────────
   useEffect(() => { load(); }, []);
 
   async function load() {
@@ -42,7 +37,6 @@ export default function Home() {
     }
   }
 
-  // ── Derived values ────────────────────────────────────────────
   const visible = useMemo(() => {
     const q = search.toLowerCase().trim();
     return todos
@@ -60,19 +54,18 @@ export default function Home() {
     completed: todos.filter(t =>  t.completed).length,
   }), [todos]);
 
-  // ── Helpers ───────────────────────────────────────────────────
   function patch(updated) {
     setTodos(prev => prev.map(t => t.id === updated.id ? updated : t));
   }
 
   function formatDate(dateStr) {
     if (!dateStr) return null;
+    // Append time so the Date constructor treats this as local, not UTC midnight
     return new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', year: 'numeric',
     });
   }
 
-  // ── Handlers ──────────────────────────────────────────────────
   async function handleAdd(e) {
     e.preventDefault();
     if (!form.title.trim()) return;
@@ -130,11 +123,9 @@ export default function Home() {
     }
   }
 
-  // ── Render ────────────────────────────────────────────────────
   return (
     <div className="page">
 
-      {/* Header */}
       <header className="page-header">
         <h1>My Todos</h1>
         <p className="summary">
@@ -143,7 +134,6 @@ export default function Home() {
         </p>
       </header>
 
-      {/* ── Add form ── */}
       <form className="add-form" onSubmit={handleAdd}>
         <div className="add-row">
           <input
@@ -184,7 +174,6 @@ export default function Home() {
         </div>
       </form>
 
-      {/* ── Controls ── */}
       <div className="controls">
         <div className="filters">
           {['all', 'active', 'completed'].map(f => (
@@ -207,7 +196,6 @@ export default function Home() {
         />
       </div>
 
-      {/* ── Loading / Error ── */}
       {loading && <p className="state-msg">Loading todos…</p>}
 
       {error && (
@@ -217,7 +205,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── List ── */}
       {!loading && !error && (
         visible.length === 0 ? (
           <p className="state-msg empty">
@@ -231,7 +218,6 @@ export default function Home() {
               <li key={todo.id} className={`todo-item${todo.completed ? ' done' : ''}`}>
 
                 {editId === todo.id ? (
-                  /* ── Inline edit form ────────────────────── */
                   <div className="edit-form">
                     <input
                       className="input"

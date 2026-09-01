@@ -1,21 +1,16 @@
 ﻿const { randomUUID } = require("crypto");
 const { readAll, writeAll } = require("../helpers/db");
 
-// GET /todos
 function listTodos(req, res) {
-  const todos = readAll();
-  res.json(todos);
+  res.json(readAll());
 }
 
-// GET /todos/:id
 function getTodo(req, res) {
-  const todos = readAll();
-  const todo  = todos.find((t) => t.id === req.params.id);
+  const todo = readAll().find((t) => t.id === req.params.id);
   if (!todo) return res.status(404).json({ error: "Todo not found" });
   res.json(todo);
 }
 
-// POST /todos
 function createTodo(req, res) {
   const { title, description = "", priority = "medium", dueDate = null } = req.body;
 
@@ -23,39 +18,36 @@ function createTodo(req, res) {
     return res.status(400).json({ error: "title is required" });
   }
 
-  const newTodo = {
+  const todo = {
     id:          randomUUID(),
     title:       title.trim(),
     description: description.trim(),
     completed:   false,
-    priority,          // "low" | "medium" | "high"
-    dueDate,           // ISO date string or null
+    priority,    // "low" | "medium" | "high"
+    dueDate,     // ISO date string or null
     createdAt:   new Date().toISOString(),
   };
 
   const todos = readAll();
-  todos.push(newTodo);
+  todos.push(todo);
   writeAll(todos);
 
-  res.status(201).json(newTodo);
+  res.status(201).json(todo);
 }
 
-// PUT /todos/:id
 function updateTodo(req, res) {
   const todos = readAll();
   const index = todos.findIndex((t) => t.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: "Todo not found" });
 
-  const existing = todos[index];
   const { title, description, completed, priority, dueDate } = req.body;
 
-  // Validate title if provided
   if (title !== undefined && (typeof title !== "string" || title.trim() === "")) {
     return res.status(400).json({ error: "title cannot be empty" });
   }
 
   const updated = {
-    ...existing,
+    ...todos[index],
     ...(title       !== undefined && { title: title.trim() }),
     ...(description !== undefined && { description: description.trim() }),
     ...(completed   !== undefined && { completed: Boolean(completed) }),
@@ -65,11 +57,9 @@ function updateTodo(req, res) {
 
   todos[index] = updated;
   writeAll(todos);
-
   res.json(updated);
 }
 
-// DELETE /todos/:id
 function deleteTodo(req, res) {
   const todos    = readAll();
   const filtered = todos.filter((t) => t.id !== req.params.id);
