@@ -1,6 +1,6 @@
 ﻿# Ziptrrip
 
-A small full-stack todo app. The backend is a Node/Express REST API that persists data to a local JSON file. The frontend is a React (Vite) SPA with two pages: a todo list and a todo detail view.
+A small full-stack todo app. The backend is a Node/Express REST API that persists data to a local JSON file. The frontend is a multi-page React application (built with Vite) with two separate HTML pages: a todo list and a todo detail view. Navigating between pages triggers a real page load — there is no client-side routing.
 
 ---
 
@@ -34,6 +34,11 @@ Open `http://localhost:5173` in your browser. The frontend expects the backend o
 VITE_API_URL=http://localhost:<your-port>
 ```
 
+Pages:
+
+- `http://localhost:5173/` — Todo list
+- `http://localhost:5173/todo.html?id=<id>` — Todo detail
+
 ---
 
 ## Features
@@ -47,14 +52,14 @@ VITE_API_URL=http://localhost:<your-port>
 - Delete a todo with a confirmation prompt
 - Filter the list by All / Active / Done
 - Search todos by title in real time
-- Click a todo title to open its detail page
+- Click a todo title to navigate to its detail page (full page load)
 
-**Todo detail page (`/todo?id=<id>`)**
+**Todo detail page (`/todo.html?id=<id>`)**
 
 - Loads a single todo by ID from the URL query parameter
 - Displays all fields: title, description, status, priority, due date, created date, and ID
 - Edit all fields from this page and save via PUT
-- Delete the todo from this page; redirects back to the list on success
+- Delete the todo from this page; navigates back to the list on success
 - Shows a clear error message when the ID is missing, the todo is not found (404), or the server is unreachable
 
 ---
@@ -103,17 +108,18 @@ All routes are prefixed at `http://localhost:5000`.
 │   └── data/
 │       └── todos.json          # Flat-file data store
 └── frontend/
-    ├── index.html
+    ├── index.html              # Entry point for the list page
+    ├── todo.html               # Entry point for the detail page
     ├── vite.config.js
     └── src/
-        ├── main.jsx            # React entry point
-        ├── App.jsx             # Router setup
+        ├── main.jsx            # Mounts Home on index.html
+        ├── todo-main.jsx       # Mounts TodoDetail on todo.html
         ├── index.css           # Global reset
         ├── api/
         │   └── todos.js        # Fetch wrapper for all API calls
         ├── pages/
-        │   ├── Home.jsx        # Todo list page (/)
-        │   └── Todo.jsx        # Todo detail page (/todo)
+        │   ├── Home.jsx        # Todo list page
+        │   └── Todo.jsx        # Todo detail page
         └── styles/
             ├── Home.css        # List page styles
             └── Todo.css        # Detail page styles

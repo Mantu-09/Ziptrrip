@@ -1,9 +1,11 @@
 ﻿import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import * as api from '../api/todos';
 import '../styles/Todo.css';
 
 const PRIORITY_LABEL = { low: 'Low', medium: 'Medium', high: 'High' };
+
+// Read ?id= from the current page URL — no router needed
+const id = new URLSearchParams(window.location.search).get('id');
 
 function formatDate(dateStr) {
   if (!dateStr) return null;
@@ -21,19 +23,15 @@ function formatDateTime(iso) {
   });
 }
 
-function BackBtn({ onClick }) {
+function BackBtn() {
   return (
-    <button className="back-btn" onClick={onClick}>
+    <button className="back-btn" onClick={() => { window.location.href = '/'; }}>
       ← Back to list
     </button>
   );
 }
 
 export default function TodoDetail() {
-  const [searchParams] = useSearchParams();
-  const navigate       = useNavigate();
-  const id             = searchParams.get('id');
-
   const [todo,     setTodo]     = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);  // null | 'no_id' | 'not_found' | 'network'
@@ -51,7 +49,7 @@ export default function TodoDetail() {
       return;
     }
     load();
-  }, [id]);
+  }, []);
 
   async function load() {
     try {
@@ -97,7 +95,7 @@ export default function TodoDetail() {
     setDeleting(true);
     try {
       await api.deleteTodo(id);
-      navigate('/');
+      window.location.href = '/';
     } catch (err) {
       alert(`Failed to delete: ${err.message}`);
       setDeleting(false);
@@ -107,7 +105,7 @@ export default function TodoDetail() {
   if (loading) {
     return (
       <div className="detail-page">
-        <BackBtn onClick={() => navigate('/')} />
+        <BackBtn />
         <p className="state-msg">Loading…</p>
       </div>
     );
@@ -116,14 +114,14 @@ export default function TodoDetail() {
   if (error) {
     return (
       <div className="detail-page">
-        <BackBtn onClick={() => navigate('/')} />
+        <BackBtn />
         <div className="not-found-box">
           {error === 'no_id' && (
             <>
               <span className="not-found-icon">🔍</span>
               <h2>No ID provided</h2>
               <p>Open a todo from the list to see its detail page.</p>
-              <button className="btn btn-primary" onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
+              <button className="btn btn-primary" onClick={() => { window.location.href = '/'; }} style={{ marginTop: '1rem' }}>
                 Go to list
               </button>
             </>
@@ -133,7 +131,7 @@ export default function TodoDetail() {
               <span className="not-found-icon">🗒️</span>
               <h2>Todo not found</h2>
               <p>This todo may have been deleted or the link is invalid.</p>
-              <button className="btn btn-primary" onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
+              <button className="btn btn-primary" onClick={() => { window.location.href = '/'; }} style={{ marginTop: '1rem' }}>
                 Go to list
               </button>
             </>
@@ -156,7 +154,7 @@ export default function TodoDetail() {
   if (editing) {
     return (
       <div className="detail-page">
-        <BackBtn onClick={() => navigate('/')} />
+        <BackBtn />
         <div className="detail-card">
           <div className="detail-edit">
             <h2 className="detail-section-title">Edit Todo</h2>
@@ -235,7 +233,7 @@ export default function TodoDetail() {
 
   return (
     <div className="detail-page">
-      <BackBtn onClick={() => navigate('/')} />
+      <BackBtn />
 
       <div className="detail-card">
         <div className="detail-header">

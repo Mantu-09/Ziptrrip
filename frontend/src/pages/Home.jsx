@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useState, useEffect, useMemo } from 'react';
 import * as api from '../api/todos';
 import '../styles/Home.css';
 
@@ -7,8 +6,6 @@ const PRIORITY_LABEL = { low: 'Low', medium: 'Medium', high: 'High' };
 const EMPTY_FORM     = { title: '', description: '', priority: 'medium', dueDate: '' };
 
 export default function Home() {
-  const navigate = useNavigate();
-
   const [todos,   setTodos]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -121,6 +118,11 @@ export default function Home() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function openDetail(id) {
+    // Navigate to the detail page — a real page load, not client-side routing
+    window.location.href = `/todo.html?id=${id}`;
   }
 
   return (
@@ -264,7 +266,6 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  /* ── Todo row ────────────────────────────── */
                   <>
                     <input
                       type="checkbox"
@@ -276,7 +277,7 @@ export default function Home() {
                     <div className="todo-body">
                       <button
                         className="todo-title"
-                        onClick={() => navigate(`/todo?id=${todo.id}`)}
+                        onClick={() => openDetail(todo.id)}
                         title="View detail"
                       >
                         {todo.title}
